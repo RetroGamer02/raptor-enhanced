@@ -91,7 +91,7 @@ OBJS = $(RAPTOR_OBJS) $(TEXTSCREEN_OBJS)
 
 INCDIR = . include include/textscreen/include include/TinySoundFont
 CFLAGS = -O3 -G0 -fno-strict-aliasing -Wall -D__PSP__  -DPSP_SMOOTH=0 \
-         -DSBAUDIORATE -DNOCURSOR -DSBAUDIORATE -DOPL2 -DOPL_NO_NUKED
+         -DSBAUDIORATE -DSBAUDIORATE -DOPL2 -DOPL_NO_NUKED
 CXXFLAGS = $(CFLAGS) -fno-rtti -std=gnu++17
 ASFLAGS = $(CFLAGS)
 
