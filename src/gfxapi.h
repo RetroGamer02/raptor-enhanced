@@ -34,7 +34,11 @@ typedef enum
 #define CLIP_YTOP      8
 #define CLIP_YBOTTOM   16
 
+#if defined (__PSP__)
+typedef struct __attribute__((packed))
+#else
 typedef struct
+#endif
 {
     GFX_TYPE type;          // type of picture
     int opt1;               // option 1

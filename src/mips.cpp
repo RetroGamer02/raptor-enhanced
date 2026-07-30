@@ -22,8 +22,7 @@ int checkFile(const char* path, int mode)
     }
 }
 
-
-void sys_init(void) 
+void sys_init()
 {
     
 }

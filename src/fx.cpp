@@ -25,11 +25,7 @@ int fx_device;
 int fx_volume;
 static int fx_init = 0;
 static int lockcount;
-#ifdef __3DS__
-int fx_freq = 22050;
-#elif __SWITCH__
-int fx_freq = 22050;
-#elif __PSP__
+#ifdef SBAUDIORATE
 int fx_freq = 22050;
 #else
 int fx_freq = 44100;
@@ -103,7 +99,10 @@ SND_InitSound(
         return 0;
 
     if (SDL_Init(SDL_INIT_AUDIO) < 0)
+    {
+        LOG_Printf("SND_InitSound: SDL_Init(AUDIO) failed: %s", SDL_GetError());
         return 0;
+    }
 
     spec.freq = fx_freq;
     spec.format = AUDIO_S16SYS;
@@ -114,24 +113,28 @@ SND_InitSound(
 
     if ((fx_dev = SDL_OpenAudioDevice(NULL, 0, &spec, &actual, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE)) == 0)
     {
+    	LOG_Printf("SND_InitSound: open at %d Hz failed: %s", spec.freq, SDL_GetError());
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
         return 0;
     }
 
+    #ifndef __PSP__
     fx_freq = actual.freq;
     
     if (actual.format != AUDIO_S16SYS || actual.channels != 2)
     {
+    	LOG_Printf("SND_InitSound: unusable format/channels, disabling sound");
         SDL_CloseAudio();
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
         return 0;
     }
+    #endif
 
     dig_flag = 0;
     fx_device = SND_NONE;
 
     music_volume = INI_GetPreferenceLong("Music", "Volume", 127);
-    #if defined (__3DS__) || defined (__SWITCH__) || defined (XBOX)
+    #if defined (__3DS__) || defined (__SWITCH__) || defined (XBOX) || defined (__PSP__)
     music_card = M_SB;
     #else
     music_card = INI_GetPreferenceLong("Music", "CardType", M_NONE);
@@ -166,7 +169,7 @@ SND_InitSound(
     }
 
     fx_volume = INI_GetPreferenceLong("SoundFX", "Volume", 127);
-    #if defined (__3DS__) || defined (__SWITCH__) || defined (XBOX)
+    #if defined (__3DS__) || defined (__SWITCH__) || defined (XBOX) || defined (__PSP__)
         fx_card = 5;
         fx_chans = 2;
     #else

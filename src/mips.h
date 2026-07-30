@@ -1,4 +1,5 @@
 #ifdef __PSP__
+#include <psppower.h>
 #include <pspuser.h>
 #include <pspdebug.h>
 #include <pspdisplay.h>
@@ -7,7 +8,7 @@
 // Generic file copy function (kept for parity with arm.h / other console
 // ports, even though the PSP branch below doesn't currently need it since
 // there's no separate romfs archive to pull a default INI from).
-int cp(const char *to, const char *from);
+//int cp(const char *to, const char *from);
 
 // Init the target system. On PSP, SDL2's own PSP main() already brings up
 // the GU/GPU and starts the exit-callback thread before your main() runs,

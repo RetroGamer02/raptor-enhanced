@@ -24,7 +24,11 @@ typedef enum
     S_STOP
 }SONGOPTS;
 
-typedef struct 
+#if defined(__PSP__)
+typedef struct __attribute__((packed))
+#else
+typedef struct
+#endif
 {
     unsigned short opt;
     unsigned short fill;
