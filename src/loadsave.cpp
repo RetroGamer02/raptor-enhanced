@@ -939,7 +939,7 @@ RAP_LoadWin(
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
         
-        if (joy_menu_keys)
+        if (joy_ipt_MenuNew)
         {
             if (XButton)
             {
@@ -948,7 +948,7 @@ RAP_LoadWin(
             }
         }
         
-        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_menu_keys) || (JOY_IsKeyMenu(BButton) && joy_menu_keys))
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))
         {
             rval = 0;
             goto load_exit;

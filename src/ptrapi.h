@@ -6,7 +6,8 @@ typedef enum
 {
 	P_AUTO,
 	P_MOUSE,
-	P_JOYSTICK
+	P_JOYSTICK,
+	P_HYBRID //Added
 }PTRTYPE;
 
 extern int mouseb1, mouseb2, mouseb3;
@@ -17,6 +18,7 @@ extern int g_drawcursor;
 
 void PTR_JoyHandler(void);
 void PTR_MouseHandler(void);
+void PTR_HybridHandler(void); //Added
 void PTR_ResetJoyStick(void);
 void PTR_SetPos(int x, int y);
 void PTR_Pause(int flag);

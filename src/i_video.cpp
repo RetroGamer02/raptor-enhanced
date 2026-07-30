@@ -588,6 +588,10 @@ void I_GetEvent(void)
         }
     }
 
+    //Addme
+    if (control == 3)
+        PTR_HybridHandler();
+
     if ((control == 2) && (!joy_ipt_MenuNew))
         PTR_JoyHandler();
     

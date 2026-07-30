@@ -43,6 +43,43 @@ int cur_mx, cur_my;
 int old_joy_x, old_joy_y;
 
 /*------------------------------------------------------------------------
+   PTR_HybridHandler() - Joystick/Mouse Handler Function
+  ------------------------------------------------------------------------*/
+void 
+PTR_HybridHandler(
+    void
+)
+{
+    static int lasttick;
+    int now = SDL_GetTicks();
+    
+    if (now - lasttick < 1000 / 60)
+        return;
+    
+    lasttick += 1000 / 60;
+
+    cur_mx = StickX + old_joy_x;
+    cur_my = StickY + old_joy_y;
+
+    if (cur_mx > 0 && cur_mx < SCREENWIDTH)
+        I_SetMousePos(cur_mx, cur_my);
+    else
+        cur_mx = old_joy_x;
+
+    if (cur_my > 0 && cur_my < SCREENHEIGHT)  
+        I_SetMousePos(cur_mx, cur_my);
+    else
+        cur_my = old_joy_y;
+
+    if (old_joy_x != cur_mx || old_joy_y != cur_my)
+    {
+        old_joy_x = cur_mx;
+        old_joy_y = cur_my;
+        ptrupdate = 1;
+    }
+}
+
+/*------------------------------------------------------------------------
    PTR_JoyHandler() - Joystick Handler Function
   ------------------------------------------------------------------------*/
 void 

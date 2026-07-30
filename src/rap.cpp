@@ -1662,6 +1662,16 @@ main(
         ptrflag = PTR_Init(P_MOUSE);
         usekb_flag = 0;
         break;
+
+    case I_HYBRID:
+        printf("PTR_Init()-Hybrid\n");
+        fflush(stdout);
+        ptrflag = PTR_Init(P_HYBRID);
+        if (joy_ipt_MenuNew)
+            usekb_flag = 1;
+        else
+            usekb_flag = 0;
+        break;
     }
     
     if (reg_flag)

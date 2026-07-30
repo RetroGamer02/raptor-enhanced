@@ -547,9 +547,9 @@ IPT_LoadPrefs(
         // mouse-first UI. joy_ipt_MenuNew=1 would disable the pointer in
         // favour of D-pad field navigation with no visible cursor.
         opt_detail = INI_GetPreferenceLong("Setup", "Detail", 1);
-        control = 2;
+        control = 3;
         haptic = 0;
-        joy_ipt_MenuNew = 0;
+        joy_ipt_MenuNew = 1;
         joy_menu_keys = 1;    // pointer + D-pad menu keys together (see input.h)
 
         k_Up = SC_UP;
@@ -574,7 +574,7 @@ IPT_LoadPrefs(
         control = 2;
         haptic = 0;
         joy_ipt_MenuNew = 1;
-        joy_menu_keys = joy_ipt_MenuNew;
+        joy_menu_keys = 0;
 
         k_Up = SC_UP;
         k_Down = SC_DOWN;
@@ -598,7 +598,7 @@ IPT_LoadPrefs(
         control = 2;
         haptic = INI_GetPreferenceLong("Setup", "Haptic", 0);
         joy_ipt_MenuNew = 1;
-        joy_menu_keys = joy_ipt_MenuNew;
+        joy_menu_keys = 0;
 
         k_Up = SC_UP;
         k_Down = SC_DOWN;
@@ -622,7 +622,7 @@ IPT_LoadPrefs(
         control = INI_GetPreferenceLong("Setup", "Control", 0);
         haptic = INI_GetPreferenceLong("Setup", "Haptic", 1);
         joy_ipt_MenuNew = INI_GetPreferenceLong("Setup", "joy_ipt_MenuNew", 0);
-        joy_menu_keys = joy_ipt_MenuNew;
+        joy_menu_keys = 0;
         
         k_Up = INI_GetPreferenceLong("Keyboard", "MoveUp", SC_UP);
         k_Down = INI_GetPreferenceLong("Keyboard", "MoveDn", SC_DOWN);

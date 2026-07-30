@@ -5,7 +5,8 @@ typedef enum
 	I_KEYBOARD,
 	I_MOUSE,
 	I_JOYSTICK,
-	I_FORCE
+	I_FORCE,
+	I_HYBRID //Added
 }ITYPE;
 
 #define BUT_1 ( buttons[0] )

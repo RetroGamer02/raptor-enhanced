@@ -585,31 +585,62 @@ SWD_DoButton(
 )
 {
     // == CONTROLLER INPUT ==============================
-
-    if (joy_menu_keys)
+    
+    if (joy_ipt_MenuNew &! joy_menu_keys)                                                 
+    {
+        if (StickY > 0 || Down)                                                   
+        {
+            if (JOY_IsScroll(0) == 1)
+                g_key = SC_DOWN;
+        }
+        
+        if (StickY < 0 || Up)
+        {
+            if (JOY_IsScroll(0) == 1)
+                g_key = SC_UP;
+        }
+        
+        if (StickX > 0 || Right)
+        {
+            if (JOY_IsScroll(0) == 1)
+                g_key = SC_RIGHT;
+        }
+        
+        if (StickX < 0 || Left)
+        {
+            if (JOY_IsScroll(0) == 1)
+                g_key = SC_LEFT;
+        }
+        
+        if (AButton)
+        {
+            JOY_IsKey(AButton);
+            g_key = SC_ENTER;
+        }
+    } else if (joy_menu_keys)
     {
         // The stick only doubles as arrows in pure MenuNew mode (3DS/Switch,
         // no pointer). In the PSP hybrid the nub is the cursor, so only the
         // D-pad synthesizes arrow keys.
-        if ((joy_ipt_MenuNew && StickY > 0) || Down)
+        if (Down)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = SC_DOWN;
         }
 
-        if ((joy_ipt_MenuNew && StickY < 0) || Up)
+        if (Up)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = SC_UP;
         }
 
-        if ((joy_ipt_MenuNew && StickX > 0) || Right)
+        if (Right)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = SC_RIGHT;
         }
 
-        if ((joy_ipt_MenuNew && StickX < 0) || Left)
+        if (Left)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = SC_LEFT;
@@ -704,14 +735,14 @@ SWD_FieldInput(
     
     curpos = strlen(wrkbuf);
     
-    // == CONTROLLER FIELDINPUT ==============================
-
-    if (joy_menu_keys)
+    // == CONTROLLER FIELDINPUT ==============================   
+    
+    if (joy_ipt_MenuNew &! joy_menu_keys)
     {
         
         // == INPUT CONTROLLER MAX FIELDINPUT ==============================
-
-        if ((joy_ipt_MenuNew && StickY) || Down || Up || AButton || YButton || Start)
+        
+        if (StickY || Down || Up || AButton || YButton || Start)            
         {
             if (curpos > 17)
             {
@@ -731,7 +762,7 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER ASCII TABLE DOWN ==============================
 
-        if ((joy_ipt_MenuNew && StickY > 0) || Down)
+        if (StickY > 0 || Down)                                                    
         {
             if (JOY_IsScroll(0) == 1)
             {
@@ -760,7 +791,7 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER ASCII TABLE UP ==============================
 
-        if ((joy_ipt_MenuNew && StickY < 0) || Up)
+        if (StickY < 0 || Up)                                                    
         {
             if (JOY_IsScroll(0) == 1)
             {
@@ -787,13 +818,147 @@ SWD_FieldInput(
             }
         }
         
-        if ((joy_ipt_MenuNew && StickX > 0) || Right)
+        if (StickX > 0 || Right)
+        {
+            if (JOY_IsScroll(0) == 1)
+                g_key = SC_RIGHT;
+        }
+        
+        if (StickX < 0 || Left)
+        {
+            if (JOY_IsScroll(0) == 1)
+                g_key = SC_LEFT;
+        }
+        
+        // == INPUT CONTROLLER NEXT INPUT ==============================
+
+        if (AButton)                                                  
+        {
+            JOY_IsKey(AButton);
+            curpos++;
+            fi_joy_count = 0;
+        }
+        
+        // == INPUT CONTROLLER DELETE ==============================
+
+        if (XButton)                                                  
+        {
+            JOY_IsKey(XButton);
+            flag = 1;
+            
+            if (curpos > 0)
+                curpos--;
+            
+            wrkbuf[curpos] = 0;
+            fi_joy_count = 0;
+        }
+        
+        // == INPUT CONTROLLER SPACE ==============================
+        
+        if (YButton)                                                  
+        {
+            JOY_IsKey(YButton);
+            wrkbuf[curpos + 1] = 0;
+            g_joy_ascii = 0x20;
+            wrkbuf[curpos] = g_joy_ascii;
+            fi_joy_count = 0;
+        }
+        
+        // == INPUT CONTROLLER CONFIRM ==============================
+
+        if (Start)                                                   
+        {
+            JOY_IsKey(Start);
+            g_key = SC_ENTER;
+            fi_joy_count = 0;
+        }
+    } else if (joy_menu_keys) {
+        
+        // == INPUT CONTROLLER MAX FIELDINPUT ==============================
+
+        if (Down || Up || AButton || YButton || Start)
+        {
+            if (curpos > 17)
+            {
+                curpos--;
+                wrkbuf[curpos] = 0;
+            }
+            
+            if (fi_sec_field)
+            {
+                if (curpos > 10)
+                {
+                    curpos--;
+                    wrkbuf[curpos] = 0;
+                }
+            }
+        }
+        
+        // == INPUT CONTROLLER ASCII TABLE DOWN ==============================
+
+        if (Down)
+        {
+            if (JOY_IsScroll(0) == 1)
+            {
+                if (fi_joy_count > 0)
+                {
+                    curpos--;
+                    g_joy_ascii--;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    
+                    if (g_joy_ascii < 0x30)
+                    {
+                        g_joy_ascii = 0x5a;
+                        wrkbuf[curpos] = g_joy_ascii;
+                    }
+                }
+                
+                if (fi_joy_count == 0)
+                {
+                    fi_joy_count++;
+                    g_joy_ascii = 0x41;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    wrkbuf[curpos + 1] = 0;
+                }
+            }
+        }
+        
+        // == INPUT CONTROLLER ASCII TABLE UP ==============================
+
+        if (Up)
+        {
+            if (JOY_IsScroll(0) == 1)
+            {
+                if (fi_joy_count > 0)
+                {
+                    curpos--;
+                    g_joy_ascii++;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    
+                    if (g_joy_ascii > 0x5a)
+                    {
+                        g_joy_ascii = 0x30;
+                        wrkbuf[curpos] = g_joy_ascii;
+                    }
+                }
+                
+                if (fi_joy_count == 0)
+                {
+                    fi_joy_count++;
+                    g_joy_ascii = 0x41;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    wrkbuf[curpos + 1] = 0;
+                }
+            }
+        }
+        
+        if (Right)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = SC_RIGHT;
         }
 
-        if ((joy_ipt_MenuNew && StickX < 0) || Left)
+        if (Left)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = SC_LEFT;
@@ -1906,11 +2071,14 @@ SWD_SetWindowPtr(
     {
         curfld = (SFIELD*)((char*)curwin + LE_LONG(curwin->fldofs));
         curfld += active_field;
-
-        // Field coords are window-relative (see SWD_GetFieldXYL);
+        if (joy_menu_keys) {
+        	// Field coords are window-relative (see SWD_GetFieldXYL);
         // add the window origin or non-origin windows snap wrong.
         PTR_SetPos(LE_LONG(curwin->x) + LE_LONG(curfld->x) + (LE_LONG(curfld->lx)>>1),
                    LE_LONG(curwin->y) + LE_LONG(curfld->y) + (LE_LONG(curfld->ly)>>1));
+        } else {
+        	PTR_SetPos(LE_LONG(curfld->x) + (LE_LONG(curfld->lx)>>1), LE_LONG(curfld->y) + (LE_LONG(curfld->ly)>>1));
+        }
     }
 }
 
@@ -1941,10 +2109,14 @@ SWD_SetFieldPtr(
     {
         curfld = (SFIELD*)((char*)curwin + LE_LONG(curwin->fldofs));
         curfld += field;
-
-        // Field coords are window-relative (see SWD_GetFieldXYL).
-        PTR_SetPos(LE_LONG(curwin->x) + LE_LONG(curfld->x) + (LE_LONG(curfld->lx)>>1),
+        
+        if (joy_menu_keys) {
+        	// Field coords are window-relative (see SWD_GetFieldXYL).
+        	PTR_SetPos(LE_LONG(curwin->x) + LE_LONG(curfld->x) + (LE_LONG(curfld->lx)>>1),
                    LE_LONG(curwin->y) + LE_LONG(curfld->y) + (LE_LONG(curfld->ly)>>1));
+        } else {
+        	PTR_SetPos(LE_LONG(curfld->x) + (LE_LONG(curfld->lx)>>1), LE_LONG(curfld->y) + (LE_LONG(curfld->ly)>>1));
+        }
     }
 }
 
@@ -2348,6 +2520,7 @@ SWD_Dialog(
     if (active_field == -1)
         return;
 
+	//Check me start
     // Pointer+menu-keys hybrid (PSP): while a text-input field is active,
     // Cross must reach SWD_FieldInput ("next character" during name entry),
     // so it does not count as a click there.
@@ -2370,7 +2543,7 @@ SWD_Dialog(
             JOY_IsKey(AButton);
             cur_act = S_FLD_COMMAND;
             cur_cmd = F_SELECT;
-        }
+        } //End of check me
         else if (mousehit)
         {
             if (old_win != active_window)
@@ -2517,14 +2690,8 @@ SWD_Dialog(
             update = 1;
             break;
         }
-
-        // PSP hybrid: D-pad navigation snaps the cursor onto the newly
-        // selected field (same idea as the hangar's own PTR_SetPos logic),
-        // so a following Cross press clicks exactly what is highlighted.
-        if (cur_cmd != F_SELECT && joy_menu_keys && !joy_ipt_MenuNew)
-            SWD_SetWindowPtr(active_window);
         break;
-
+    
     case S_WIN_COMMAND:
         swd_dlg->x = LE_LONG(curwin->x);
         swd_dlg->y = LE_LONG(curwin->y);

@@ -240,14 +240,16 @@ JOY_Wait(
 	int button
 )
 {
-	// In the PSP pointer+menu-keys hybrid the stick is the cursor, not a
-	// key: never spin waiting for it to recentre (it is legitimately held
-	// while navigating with the D-pad or clicking with Cross).
-	int stick = !(joy_menu_keys && !joy_ipt_MenuNew);
-
-	while ((stick && (StickX || StickY)) || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
-	{
-		I_GetEvent();
+	if (control == 3) {
+		while (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+		{
+			I_GetEvent();
+		}
+	} else {
+		while (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+		{
+			I_GetEvent();
+		}
 	}
 }
 
@@ -259,15 +261,21 @@ JOY_IsKey(
 	int button
 )
 {
-	int stick = !(joy_menu_keys && !joy_ipt_MenuNew);
-
-	if ((stick && (StickX || StickY)) || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
-	{
-		JOY_Wait(button);
-
-		return 1;
-	}
-
+	if (control == 3) {
+		if (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+		{
+			JOY_Wait(button);
+			
+			return 1;
+		}
+	} else {
+		if (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+		{
+			JOY_Wait(button);
+			
+			return 1;
+		}
+   }
 	return 0;
 }
 
