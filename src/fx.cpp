@@ -42,7 +42,9 @@ typedef struct
 DFX fx_items[FX_LAST_SND];
 int fx_loaded;
 
+#ifndef SDL12
 SDL_AudioDeviceID fx_dev;
+#endif
 
 char cards[M_LAST][23] = {
     "None",
@@ -100,12 +102,17 @@ SND_InitSound(
     spec.callback = FX_Fill;
     spec.userdata = NULL;
 
+    #ifdef SDL12
+	SDL_OpenAudio(&spec, NULL);
+	#else
     if ((fx_dev = SDL_OpenAudioDevice(NULL, 0, &spec, &actual, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE)) == 0)
     {
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
         return 0;
     }
+    #endif
 
+    #ifndef SDL12
     fx_freq = actual.freq;
     
     if (actual.format != AUDIO_S16SYS || actual.channels != 2)
@@ -114,6 +121,7 @@ SND_InitSound(
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
         return 0;
     }
+    #endif
 
     dig_flag = 0;
     fx_device = SND_NONE;
@@ -209,7 +217,11 @@ SND_InitSound(
     if (fx_card == M_ADLIB || fx_card == M_WAVE || fx_card == M_CANVAS || fx_card == M_GMIDI)
         GSS_Init(fx_card, 0);
 
+    #ifdef SDL12
+    SDL_PauseAudio(0);
+	#else
     SDL_PauseAudioDevice(fx_dev, 0);
+    #endif
 
     fx_init = 1;
     
@@ -1107,7 +1119,11 @@ SND_Lock(
 )
 {
     if (!lockcount)
+    #ifdef SDL12
+        SDL_LockAudio();
+    #else
         SDL_LockAudioDevice(fx_dev);
+    #endif
     
     lockcount++;
 }
@@ -1123,5 +1139,9 @@ SND_Unlock(
     lockcount--;
     
     if (!lockcount)
+    #ifdef SDL12
+        SDL_UnlockAudio();
+    #else
         SDL_UnlockAudioDevice(fx_dev);
+    #endif
 }

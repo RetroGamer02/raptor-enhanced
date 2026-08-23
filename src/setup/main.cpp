@@ -10,7 +10,9 @@
 #define PATH_MAX        4096
 #endif // __GNUC__
 
+#ifndef SDL12
 #include "SDL_filesystem.h"
+#endif
 #include "textscreen.h"
 #include "prefapi.h"
 #include "main.h"
@@ -189,7 +191,11 @@ const char* RAP_DataPath(void)
 	char* gethome;
 	char g_setup_pathlc[PATH_MAX];
 
+	#ifdef SDL12
+    gethome = "";
+	#else
 	gethome = SDL_GetPrefPath("", "Raptor");
+	#endif
 
 	if (gethome != NULL)
 	{
@@ -203,7 +209,9 @@ const char* RAP_DataPath(void)
 			sprintf(g_setup_path, "%s%s", g_setup_path, "SETUP.INI");
 		
 		hasdatapath = 1;
+		#ifndef SDL12
 		SDL_free(gethome);
+		#endif
 	}
 	else
 	{

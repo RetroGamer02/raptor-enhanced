@@ -14,3 +14,4 @@ build-linux/
 linux-smoketest.sh
 __pycache__/
 runs/
+*.map

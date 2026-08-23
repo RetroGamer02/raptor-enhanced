@@ -264,7 +264,9 @@ ShutDown(
         mem = GLB_GetItem(FILE001_LASTSCR1_TXT);     //Get ANSI Screen Shareware from GLB to char*
 
     closewindow();                                   //Close Main Window
+    #ifndef SDL12
     I_LASTSCR(mem);                                  //Call to display ANSI Screen 
+    #endif
     GLB_FreeAll();
     IPT_CloJoy();                                    //Close Joystick
     SWD_End();
@@ -1405,8 +1407,10 @@ main(
     if (access(RAP_SetupFilename(), 0))
     {
         printf("\n\n** You must run SETUP first! **\n");
+        #ifndef SDL12
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
             "Raptor", "** You must run SETUP first! **", NULL);
+        #endif
         exit(0);
     }
 #endif //_WIN32 || __linux__ || __APPLE__
@@ -1483,8 +1487,10 @@ main(
         !numfiles)
     {
         printf("All game data files NOT FOUND cannot proceed !!\n");
+        #ifndef SDL12
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
             "Raptor", "All game data files NOT FOUND cannot proceed !!", NULL);
+        #endif
         exit(0);
     }
     

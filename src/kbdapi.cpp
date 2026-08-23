@@ -157,6 +157,7 @@ I_HandleKeyboardEvent(
     
     switch (sdlevent->key.keysym.scancode)
     {
+    #ifndef SDL12
     case SDL_SCANCODE_LCTRL:
     case SDL_SCANCODE_RCTRL:
         key = 0x1d;
@@ -174,6 +175,7 @@ I_HandleKeyboardEvent(
     case SDL_SCANCODE_RALT:
         key = 0x38;
         break;
+    #endif
 
 #ifdef __ANDROID__
     case SDL_SCANCODE_AC_BACK:

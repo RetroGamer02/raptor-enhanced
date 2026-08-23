@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#ifndef SDL12
 #include "SDL_filesystem.h"
+#endif
 #include "common.h"
 #include "loadsave.h"
 #include "rap.h"
@@ -1096,6 +1098,8 @@ RAP_InitLoadSave(
     #if __ANDROID__
     gethome = (char*)SDL_AndroidGetExternalStoragePath();
     strcat(gethome, "/");
+    #elif SDL12
+    gethome = "";
     #else
     gethome = SDL_GetPrefPath("", "Raptor");
     #endif //__ANDROID__
@@ -1111,7 +1115,9 @@ RAP_InitLoadSave(
             sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
         
         cdflag = 1;
+        #ifndef SDL12
         SDL_free(gethome);
+        #endif
     }
     else
     {

@@ -62,8 +62,10 @@ ALSA_Init(
 	if (err) 
 	{
 		printf("Error opening ALSA seq: %s\n", snd_strerror(err));
+		#ifndef SDL12
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
 			"Raptor", "Error opening ALSA seq", NULL);
+		#endif
 		exit(err);
 	}
 	
@@ -79,8 +81,10 @@ ALSA_Init(
 	if (port < 0) 
 	{
 		printf("Error opening ALSA port: %s\n", snd_strerror(port));
+		#ifndef SDL12
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
 			"Raptor", "Error opening ALSA port", NULL);
+		#endif
 		snd_seq_close(seq);
 		exit(port);
 	}
@@ -90,8 +94,10 @@ ALSA_Init(
 	if (err) 
 	{
 		printf("Couldn't connect to synth: %s\n", snd_strerror(err));
+		#ifndef SDL12
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
 			"Raptor", "Couldn't connect to synth", NULL);
+		#endif
 		snd_seq_close(seq);
 		exit(err);
 	}
@@ -101,8 +107,10 @@ ALSA_Init(
 	if (err) 
 	{
 		printf("Couldn't set buffer size: %s\n", snd_strerror(err));
+		#ifndef SDL12
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
 			"Raptor", "Couldn't set buffer size", NULL);
+		#endif
 		snd_seq_close(seq);
 		exit(err);
 	}

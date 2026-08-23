@@ -173,6 +173,7 @@ I_HandleTouchEvent(
 {
     switch (sdlevent->type)
     {
+        #ifndef SDL12
         case SDL_FINGERDOWN:
             if (SDL_GetNumTouchFingers(sdlevent->tfinger.touchId) == 3)
             {
@@ -225,6 +226,7 @@ I_HandleTouchEvent(
             mouseb2 = 0;
             mouseb3 = 0;
             break;
+        #endif
     }
 }
 

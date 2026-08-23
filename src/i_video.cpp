@@ -43,8 +43,12 @@
 // These are (1) the window (or the full screen) that our game is rendered to
 // and (2) the renderer that scales the texture (see below) into this window.
 
+#ifdef SDL12
+static SDL_Surface *screen;
+#else
 static SDL_Window *screen;
 static SDL_Renderer *renderer;
+#endif
 
 // Window title
 
@@ -57,14 +61,18 @@ static const char *window_title = "";
 // is upscaled by an integer factor UPSCALE using "nearest" scaling and which
 // in turn is finally rendered to screen using "linear" scaling.
 
+#ifndef SDL12
 static SDL_Surface *screenbuffer = NULL;
 static SDL_Surface *argbbuffer = NULL;
 static SDL_Texture *texture = NULL;
 static SDL_Texture *texture_upscaled = NULL;
+#endif
 
 // Widescreen cockpit bezel: art drawn in the pillar area beside the 4:3 game.
 #include "bezel_art.h"
+#ifndef SDL12
 static SDL_Texture *bezel_texture = NULL;
+#endif
 int widescreen_bezel = 0;
 
 static SDL_Rect blit_rect = {
@@ -221,6 +229,7 @@ void VIDEO_LoadPrefs(void)
 }
 
 // Decode the embedded RLE cockpit bezel into a static texture (once).
+#ifndef SDL12
 static void I_InitBezel(void)
 {
     if (bezel_texture != NULL)
@@ -252,6 +261,7 @@ static void I_InitBezel(void)
 
     free(rgba);
 }
+#endif
 
 static bool MouseShouldBeGrabbed()
 {
@@ -308,6 +318,7 @@ void I_SetGrabMouseCallback(grabmouse_callback_t func)
 
 static void SetShowCursor(bool show)
 {
+    #ifndef SDL12
     if (!screensaver_mode)
     {
 #if 1
@@ -319,6 +330,7 @@ static void SetShowCursor(bool show)
         SDL_ShowCursor(show);
 #endif
     }
+    #endif
 }
 
 void I_ShutdownGraphics(void)
@@ -353,6 +365,7 @@ static void AdjustWindowSize(void)
     }
 }
 
+#ifndef SDL12
 static void HandleWindowEvent(SDL_WindowEvent *event)
 {
     int i;
@@ -418,7 +431,9 @@ static void HandleWindowEvent(SDL_WindowEvent *event)
             break;
     }
 }
+#endif
 
+#ifndef SDL12
 static bool ToggleFullScreenKeyShortcut(SDL_Keysym *sym)
 {
     Uint16 flags = (KMOD_LALT | KMOD_RALT);
@@ -428,9 +443,11 @@ static bool ToggleFullScreenKeyShortcut(SDL_Keysym *sym)
     return (sym->scancode == SDL_SCANCODE_RETURN ||
             sym->scancode == SDL_SCANCODE_KP_ENTER) && (sym->mod & flags) != 0;
 }
+#endif
 
 static void I_ToggleFullScreen(void)
 {
+    #ifndef SDL12
     unsigned int flags = 0;
 
     // TODO: Consider implementing fullscreen toggle for SDL_WINDOW_FULLSCREEN
@@ -455,6 +472,7 @@ static void I_ToggleFullScreen(void)
         AdjustWindowSize();
         SDL_SetWindowSize(screen, window_width, window_height);
     }
+    #endif
 }
 
 void I_GetEvent(void)
@@ -473,16 +491,19 @@ void I_GetEvent(void)
         switch (sdlevent.type)
         {
             case SDL_KEYDOWN:
+                #ifndef SDL12
                 if (ToggleFullScreenKeyShortcut(&sdlevent.key.keysym))
                 {
                     I_ToggleFullScreen();
                     break;
                 }
+                #endif
                 // deliberate fall-though
 
             case SDL_KEYUP:
 		        I_HandleKeyboardEvent(&sdlevent);
                 break;
+            #ifndef SDL12
             case SDL_CONTROLLERDEVICEADDED:
                 IPT_CalJoy();
                 break;
@@ -506,6 +527,7 @@ void I_GetEvent(void)
                     I_HandleMouseEvent(&sdlevent);
                 }
                 break;
+            #endif
 
             case SDL_QUIT:
 #if 1
@@ -524,12 +546,14 @@ void I_GetEvent(void)
 #endif
                 break;
 
+            #ifndef SDL12
             case SDL_WINDOWEVENT:
                 if (sdlevent.window.windowID == SDL_GetWindowID(screen))
                 {
                     HandleWindowEvent(&sdlevent.window);
                 }
                 break;
+            #endif
 
             default:
                 break;
@@ -576,6 +600,7 @@ void I_GetEvent(void)
 
 static void UpdateGrab(void)
 {
+    #ifndef SDL12
     static bool currently_grabbed = false;
     bool grab;
 
@@ -609,8 +634,10 @@ static void UpdateGrab(void)
     }
 
     currently_grabbed = grab;
+    #endif
 }
 
+#ifndef SDL12
 static void LimitTextureSize(int *w_upscale, int *h_upscale)
 {
     SDL_RendererInfo rinfo;
@@ -678,7 +705,9 @@ static void LimitTextureSize(int *w_upscale, int *h_upscale)
                rinfo.max_texture_width, rinfo.max_texture_height);
     }
 }
+#endif
 
+#ifndef SDL12
 static void CreateUpscaledTexture(bool force)
 {
     int w, h;
@@ -762,6 +791,7 @@ static void CreateUpscaledTexture(bool force)
         SDL_DestroyTexture(old_texture);
     }
 }
+#endif
 
 //
 // I_FinishUpdate
@@ -774,6 +804,19 @@ void I_FinishUpdate (void)
 
     // if (noblit)
     //     return;
+
+    #ifdef SDL12
+    //UpdateGrab();
+
+    if (palette_to_set)
+    {
+        SDL_SetColors(screen, palette, 0, 256);
+        palette_to_set = false;
+    }
+
+    SDL_Flip(screen); //If Double Buffering
+    //SDL_UpdateRect(screen, 0, 0, 0, 0);
+    #else
 
     if (need_resize)
     {
@@ -890,6 +933,7 @@ void I_FinishUpdate (void)
     // Restore background and undo the disk indicator, if it was drawn.
     V_RestoreDiskBackground();
 #endif
+    #endif
 }
 
 
@@ -980,6 +1024,7 @@ void I_SetWindowTitle(const char *title)
 
 void I_InitWindowTitle(void)
 {
+    #ifndef SDL12
     SDL_SetWindowTitle(screen, "Raptor");
 #if 0
     char *buf;
@@ -988,6 +1033,7 @@ void I_InitWindowTitle(void)
     SDL_SetWindowTitle(screen, buf);
     free(buf);
 #endif
+    #endif
 }
 
 // Set the application icon
@@ -1192,6 +1238,7 @@ static void SetSDLVideoDriver(void)
 // Check the display bounds of the display referred to by 'video_display' and
 // set x and y to a location that places the window in the center of that
 // display.
+#ifndef SDL12
 static void CenterWindow(int *x, int *y, int w, int h)
 {
     SDL_Rect bounds;
@@ -1206,9 +1253,11 @@ static void CenterWindow(int *x, int *y, int w, int h)
     *x = bounds.x + SDL_max((bounds.w - w) / 2, 0);
     *y = bounds.y + SDL_max((bounds.h - h) / 2, 0);
 }
+#endif
 
 void I_GetWindowPosition(int *x, int *y, int w, int h)
 {
+    #ifndef SDL12
     // Check that video_display corresponds to a display that really exists,
     // and if it doesn't, reset it.
     if (video_display < 0 || video_display >= SDL_GetNumVideoDisplays())
@@ -1249,10 +1298,27 @@ void I_GetWindowPosition(int *x, int *y, int w, int h)
         fprintf(stderr, "I_GetWindowPosition: invalid window_position setting\n");
         *x = *y = SDL_WINDOWPOS_UNDEFINED;
     }
+    #endif
 }
 
 static void SetVideoMode(void)
 {
+    #ifdef SDL12
+    /*
+     * Initialize the display in a 320x200 8-bit palettized mode,
+     * requesting a hardware surface
+     */
+    
+    //window_width = 320;
+    //window_height = 200;
+
+    screen = SDL_SetVideoMode(320, 200, 8, SDL_HWSURFACE);
+    
+    if ( screen == NULL ) {
+        fprintf(stderr, "Couldn't set 320x200x8 video mode: %s\n",
+                        SDL_GetError());
+    }
+    #else
     int w, h;
     int x, y;
     unsigned int rmask, gmask, bmask, amask;
@@ -1464,10 +1530,41 @@ static void SetVideoMode(void)
 
     // Build the widescreen cockpit bezel texture for this renderer.
     I_InitBezel();
+    #endif
 }
 
 void I_InitGraphics(uint8_t *pal)
 {
+    #ifdef SDL12
+    /* Initialize the SDL library */
+    if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+        fprintf(stderr,
+                "Couldn't initialize SDL: %s\n", SDL_GetError());
+        //exit(1);
+    }
+
+    /* Clean up on exit */
+    atexit(SDL_Quit);
+
+    SDL_ShowCursor(SDL_DISABLE);
+
+    SetVideoMode();
+
+    SDL_FillRect(screen, NULL, 0);
+    I_SetPalette(pal);
+    SDL_SetPalette(screen, 0, palette, 0, 256);
+
+    // The actual 320x200 canvas that we draw to. This is the pixel buffer of
+    // the 8-bit paletted screen buffer that gets blit on an intermediate
+    // 32-bit RGBA screen buffer that gets loaded into a texture that gets
+    // finally rendered into our window or full screen in I_FinishUpdate().
+
+    I_VideoBuffer = (pixel_t*)screen->pixels;
+
+    //while (SDL_PollEvent(&dummy));
+
+    initialized = true;
+    #else
     SDL_Event dummy;
     char *env;
     int rw = 0, rh = 0;
@@ -1570,6 +1667,7 @@ void I_InitGraphics(uint8_t *pal)
     {
         screencoordpoint = 1;
     }
+    #endif
 }
 
 // Bind all variables controlling video options into the configuration
@@ -1600,6 +1698,7 @@ void I_BindVideoVariables(void)
 
 void I_GetMousePos(int *x, int *y)
 {
+    #ifndef SDL12
     SDL_Rect viewport;
     float sx, sy;
     SDL_GetMouseState(x, y);
@@ -1616,10 +1715,12 @@ void I_GetMousePos(int *x, int *y)
 
     *x = (int)(*x / sx) - viewport.x;
     *y = (int)(((*y / sy - viewport.y) * (float)SCREENHEIGHT) / actualheight);
+    #endif
 }
 
 void I_SetMousePos(int x, int y)
 {
+    #ifndef SDL12
     SDL_Rect viewport;
     float sx, sy;
     SDL_RenderGetViewport(renderer, &viewport);
@@ -1636,11 +1737,16 @@ void I_SetMousePos(int x, int y)
     x = (int)((x + viewport.x) * sx);
     y = (int)(((y * actualheight) / (float)SCREENHEIGHT + viewport.y) * sy);
     SDL_WarpMouseInWindow(screen, x, y);
+    #endif
 }
 
 void closewindow(void)
 {
+    #ifdef SDL12
+    SDL_FreeSurface(screen);
+    #else
     SDL_DestroyWindow(screen);
+    #endif
 }
 
 bool I_GetNeedResize(bool setonlypos)

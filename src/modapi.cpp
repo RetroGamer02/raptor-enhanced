@@ -31,6 +31,8 @@
 #include "delta.h"
 #include "rap.h"
 
+#include <system_error>
+
 namespace fs = std::filesystem;
 
 struct ModEntry

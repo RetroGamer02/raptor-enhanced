@@ -14,7 +14,7 @@
 // DESCRIPTION:
 //    Exit text-mode ENDOOM screen.
 //
-
+#ifndef SDL12
 
 #include <stdio.h>
 #include <string.h>
@@ -84,3 +84,4 @@ void I_LASTSCR(char* mem)
 
     TXT_Shutdown();
 }
+#endif
